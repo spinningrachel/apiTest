@@ -1,0 +1,4623 @@
+openapi: '3.0.0'
+servers:
+  - url: 'https://api-prod.surfsight.net/{apiVersion}'
+    description: 'The production API server'
+    variables:
+      apiVersion:
+        default: 'v2'
+        enum:
+          - 'v2'
+info:
+  description: 'SurfSight API'
+  version: '2.0.0'
+  title: 'SurfSight API'
+  contact:
+    email: 'support@surfsight.com'
+tags:
+  - name: 'Authentication'
+    description: 'Everything about authentication endpoints.'
+  - name: 'Devices'
+    description: 'Everything about devices endpoints.'
+  - name: 'Organizations'
+    description: 'Everything about organizations endpoints.'
+externalDocs:
+  description: Quickstart Guide - Please read
+  url: https://documentation.s3.us-east-2.amazonaws.com/v2/SurfsightAPI.html
+paths:
+  /authenticate:
+    post:
+      tags:
+        - 'Authentication'
+      description:
+        'This endpoint is used to authenticate the user. It must be used prior
+        to making any other API calls. Token obtained from this call should be inserted
+        in all other API calls in http header in the form of authorization: bearer {token}'
+      summary: 'API endpoint for user authentication'
+      operationId: 'postAuthenticate'
+      requestBody:
+        $ref: '#/components/requestBodies/postAuthenticate'
+      responses:
+        '200':
+          $ref: '#/components/responses/postAuthenticate'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /organizations/{orgId}/users:
+    post:
+      tags:
+        - 'Users'
+      security:
+        - bearerAuth: []
+      description: 'Allows to create users within an organization by a partner'
+      summary: 'Create users'
+      operationId: postOrganizationUsers
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+      requestBody:
+        $ref: '#/components/requestBodies/postOrganizationUsers'
+      responses:
+        '200':
+          $ref: '#/components/responses/postOrganizationUsers'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /organizations/{orgId}/devices/calibrate-accelerometer:
+    post:
+      tags:
+        - 'Device Operations'
+      description: 'Allows to calibrate device accelerometer remotely, for a single or multiple devices. This request will only work on devices that are online'
+      summary: 'Calibrate accelerometer'
+      operationId: 'postOrganizationDevicesCalibrateAccelerometer'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+      requestBody:
+        $ref: '#/components/requestBodies/postOrganizationDevicesCalibrateAccelerometer'
+      responses:
+        '200':
+          $ref: '#/components/responses/postOrganizationDevicesCalibrateAccelerometer'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /organizations/{orgId}/bulk-devices:
+    post:
+      tags:
+        - 'Devices'
+      description: 'Allows to bulk save devices based on given list of imeis and name of devices'
+      summary: 'Bulk Save Devices'
+      operationId: 'postBulkDevices'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+      requestBody:
+        $ref: '#/components/requestBodies/postBulkDevices'
+      responses:
+        '200':
+          $ref: '#/components/responses/postBulkDevices'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/device-config:
+    put:
+      tags:
+        - 'Devices'
+      description:
+        'This API allows users to set bulk device settings such as on/off
+        rear camera, on/off sound recording, on/off distracted driver functionality and
+        more'
+      summary: 'Set bulk devices configuration'
+      operationId: 'putBulkDeviceConfig'
+      security:
+        - bearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/putBulkDeviceConfig'
+      responses:
+        '200':
+          $ref: '#/components/responses/putDeviceConfig'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}:
+    patch:
+      tags:
+        - 'Devices'
+      description: 'Allows to update a device and its various properties'
+      summary: 'Update devices'
+      operationId: 'patchDevice'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      requestBody:
+        $ref: '#/components/requestBodies/patchDevice'
+      responses:
+        '200':
+          $ref: '#/components/responses/patchDevice'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/cameras:
+    get:
+      tags:
+        - 'Devices'
+      description: >
+        This API returns a list of cameras that are available for live streaming by a specific device, the device must
+        be online for this endpoint to returns a list of cameras, the response includes all cameras that can be used for
+        live streaming, camera ID 1 is the front camera and camera ID 2 is the cabin facing camera, other cameras will
+        also be available and those are the auxiliary cameras
+      summary: 'Active cameras'
+      operationId: 'getDeviceCameras'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDeviceCameras'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '417':
+          $ref: '#/components/responses/expectationFailedError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    patch:
+      tags:
+        - 'Device Operations'
+      description: 'Update the name of an auxiliary camera.'
+      summary: 'Update auxiliary camera name'
+      operationId: 'patchDeviceCameras'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      requestBody:
+        $ref: '#/components/requestBodies/patchDeviceCameras'
+      responses:
+        '200':
+          $ref: '#/components/responses/patchDeviceCameras'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/cameras/{cameraId}/snapshot:
+    get:
+      tags:
+        - 'Recordings'
+      description: 'Receive a snapshot from a specific camera. The snapshot captures a picture of the camera’s current view. The camera must be online.'
+      summary: 'Receive camera snapshot'
+      operationId: 'getDeviceCameraSnapshot'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+        - $ref: '#/components/parameters/cameraIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDeviceCameraSnapshot'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/recording-ranges:
+    get:
+      tags:
+        - 'Recordings'
+      description: 'This API is used to obtain information about availability
+        of recordings from the given device for every camera attached to this
+        device in the given time range. Returns an array of objects for the given
+        device where each object contains pair of camera ID and array of time
+        ranges when this camera has available recordings'
+      summary: 'Obtain recording availability info'
+      operationId: 'getDeviceRecordingRanges'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+        - $ref: '#/components/parameters/startQuery'
+        - $ref: '#/components/parameters/endQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDeviceRecordingRanges'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/retention-config:
+    get:
+      tags:
+        - 'Recordings'
+      description: 'This API is used to get the current cyclic recording retention time (in minutes) for each camera ID'
+      summary: 'Retrieve recording retention time'
+      operationId: 'getDeviceRetentionConfig'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDeviceRetentionConfig'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    put:
+      tags:
+        - 'Recordings'
+      description: 'This API is used to update the current cyclic recording retention time (in minutes) for each camera ID'
+      summary: 'Update recording retention time'
+      operationId: 'putDeviceRetentionConfig'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      requestBody:
+        $ref: '#/components/requestBodies/putDeviceRetentionConfig'
+      responses:
+        '200':
+          $ref: '#/components/responses/putDeviceRetentionConfig'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/virtual-event:
+    post:
+      tags:
+        - 'Virtual Event'
+      description: >
+        This API is used to trigger generation of a virtual event trigger which causes media (either video or an image)
+        to be uploaded to the cloud. The media can be later obtained using the event-file-link method. Please note that
+        it can take time to upload the media from the device onto the cloud, if parameter "cameraId" is used than the
+        event will have media for the given "cameraId" only
+      summary: 'Generate virtual event'
+      operationId: 'postVirtualEvent'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      requestBody:
+        $ref: '#/components/requestBodies/postVirtualEvent'
+      responses:
+        '200':
+          $ref: '#/components/responses/postVirtualEvent'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '417':
+          $ref: '#/components/responses/expectationFailedError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/event-config:
+    put:
+      tags:
+        - 'Events'
+      description: 'Set events settings for bulk devices by list of IMEIs or groups'
+      summary: 'Set event settings for bulk devices'
+      operationId: 'putBulkEventConfig'
+      security:
+        - bearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/putBulkEventConfig'
+      responses:
+        '200':
+          $ref: '#/components/responses/putBulkEventConfig'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/event-config:
+    put:
+      tags:
+        - 'Events'
+      description:
+        'This API allows users to set the events configuration for a given device.
+        The configuration includes parameters such as vehicle type (which is used for
+        setting acceleration/harsh cornering/etc. events), additional type of data for every
+        type of event such as video or snapshot, and others'
+      summary: 'Set event configuration for a device'
+      operationId: 'putEventConfig'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      requestBody:
+        $ref: '#/components/requestBodies/putEventConfig'
+      responses:
+        '200':
+          $ref: '#/components/responses/putEventConfig'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    get:
+      tags:
+        - 'Events'
+      description:
+        'This API allows users to retrieve the events configuration of a given
+        device. The configuration includes parameters such as vehicle type (which is used for
+        setting acceleration/harsh cornering/etc. events), additional type of data for every
+        type of event such as video or snapshot, and others'
+      summary: 'Get event configuration of a device'
+      operationId: 'getEventConfig'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getEventConfig'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/geofences:
+    get:
+      tags:
+        - 'Geofences'
+      description: 'Returns list of all configured geo fences for the given device'
+      summary: 'Get list of geo fences'
+      operationId: 'getDeviceGeoFences'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDeviceGeoFences'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    put:
+      tags:
+        - 'Geofences'
+      description: 'Sets the list of geofences for the given device'
+      summary: 'Set list of geo fences'
+      operationId: 'setDeviceGeoFences'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      requestBody:
+        $ref: '#/components/requestBodies/setDeviceGeoFences'
+      responses:
+        '200':
+          $ref: '#/components/responses/setDeviceGeoFences'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/device-config:
+    put:
+      tags:
+        - 'Devices'
+      description:
+        'This API allows users to set various device settings such as on/off
+        rear camera, on/off sound recording, on/off distracted driver functionality and
+        more'
+      summary: 'Set device configuration'
+      operationId: 'putDeviceConfig'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      requestBody:
+        $ref: '#/components/requestBodies/putDeviceConfig'
+      responses:
+        '200':
+          $ref: '#/components/responses/putDeviceConfig'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    get:
+      tags:
+        - 'Devices'
+      description:
+        'This API allows users to get various device settings such as on/off
+        rear camera, on/off sound recording, on/off distracted driver functionality and
+        more'
+      summary: 'Get device configuration'
+      operationId: 'getDeviceConfig'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDeviceConfig'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/reboot:
+    post:
+      tags:
+        - 'Device Operations'
+      description:
+        'Reboots the device. Applicable only when the device is connected
+        to the cloud service'
+      summary: 'Reboot the device'
+      operationId: 'postDeviceReboot'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/postDeviceReboot'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /associated-devices:
+    post:
+      tags:
+        - 'Devices'
+      description: 'Fetch associated devices IDs based on a given list of IMEIs'
+      summary: 'Fetch list of associated devices IDs'
+      operationId: 'postAssociatedDevices'
+      security:
+        - bearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/postAssociatedDevices'
+      responses:
+        '200':
+          $ref: '#/components/responses/postAssociatedDevices'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '417':
+          $ref: '#/components/responses/expectationFailedError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/otg-settings:
+    post:
+      tags:
+        - 'Device Operations'
+      description: 'Enable or disable OTG for a given device, applicable only when the device is connected to the cloud service'
+      summary: 'Enable OTG in device'
+      operationId: 'postDeviceOtgSettings'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/postDeviceOtgSettings'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '417':
+          $ref: '#/components/responses/expectationFailedError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/format-storage:
+    get:
+      tags:
+        - 'Device Operations'
+      description: 'Format the device SD card, applicable only when the device is connected to the cloud service'
+      summary: 'Format the device SD card'
+      operationId: 'getDeviceFormatStorage'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDeviceFormatStorage'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '417':
+          $ref: '#/components/responses/expectationFailedError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/connect-media:
+    post:
+      tags:
+        - 'Streaming'
+      description: |
+        This call will return the URL to retrieve a recording or live video and an authentication token for
+        required for the URL, the token is valid for 30 minutes. After that it can be renewed using the same
+        API, this call will have to be called again if a device does not start streaming within 2 minutes.
+      summary: 'Prepare Device Media Streaming'
+      operationId: 'postDeviceConnectMedia'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/postDeviceConnectMedia'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/events:
+    get:
+      tags:
+        - 'Events'
+      description:
+        'Returns list of events in the given time range. Note: retention
+        period of events is 30 days'
+      summary: 'Get list of events'
+      operationId: 'getDeviceEvents'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+        - $ref: '#/components/parameters/startQuery'
+        - $ref: '#/components/parameters/endQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDeviceEvents'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/events/{eventId}:
+    get:
+      tags:
+        - 'Events'
+      description: 'Returns a specific event'
+      summary: 'Get an event'
+      operationId: 'getDeviceEvent'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+        - $ref: '#/components/parameters/eventIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDeviceEvent'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    delete:
+      tags:
+        - 'Events'
+      description: 'Delete a specific event'
+      summary: 'Delete an event'
+      operationId: 'deleteDeviceEvent'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+        - $ref: '#/components/parameters/eventIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/deleteDeviceEvent'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/event-file-link:
+    get:
+      tags:
+        - 'Events'
+      description: 'This API is used to obtain a file attached to an
+        event generated by the given device. This API can be used in
+        2 different flows. The first flow is querying for occurred
+        events in a given period of time and then downloading the files
+        for those events. In this case all information required to use
+        this API is available in the event object received from events
+        API. The second flow is when a virtual event is generated and
+        a user wants to access the event files without querying for
+        events using /devices/{imei}/events API. In this case the user
+        should have some additional info like virtual event configuration
+        on the device and IDs of the connected cameras to the device.
+        In case of virtual event the fileId parameter can be set to be
+        unit timestamp (seconds from epoch) of the event. Note that this
+        is applicable only to virtual events. For all other events fileId
+        must be obtained from /devices/{imei}/events response. *Please note
+        that URL may remain active for several minutes and possibly up to
+        a few hours, the requester may need to re-request the link if
+        it has expired (and should not relay on the expiration time in the returned URL)'
+      summary: 'Get link to a file'
+      operationId: 'getDeviceEventFileLink'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+        - $ref: '#/components/parameters/fileIdQuery'
+        - $ref: '#/components/parameters/fileTypeQuery'
+        - $ref: '#/components/parameters/cameraIdQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDeviceEventFileLink'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/trips:
+    get:
+      tags:
+        - 'Telemetry'
+      description:
+        'Returns list of trips in the given time range. Note: retention
+        period of trips data is 30 days'
+      summary: 'Get list of trips'
+      operationId: 'getDeviceTrips'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+        - $ref: '#/components/parameters/startQuery'
+        - $ref: '#/components/parameters/endQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDeviceTrips'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/gps:
+    get:
+      tags:
+        - 'Telemetry'
+      description: 'Returns GPS data'
+      summary: 'Get GPS data'
+      operationId: 'getDeviceGps'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+        - $ref: '#/components/parameters/startQuery'
+        - $ref: '#/components/parameters/endQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDeviceGps'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/telemetry:
+    get:
+      tags:
+        - 'Telemetry'
+      description: >
+        This API returns device telemetry, the device must be online for this endpoint to returns telemetry
+      summary: 'Get device telemetry'
+      operationId: 'getDeviceTelemetry'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDeviceTelemetry'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '417':
+          $ref: '#/components/responses/expectationFailedError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /devices/{imei}/{cameraId}/telemetry:
+    get:
+      tags:
+        - 'Streaming'
+      description: >
+        This API returns device camera telemetry taken from media server, to which device is connected
+      summary: 'Gets device camera telemetry'
+      operationId: 'getDeviceCameraTelemetry'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/imeiPath'
+        - $ref: '#/components/parameters/cameraIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDeviceCameraTelemetry'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '417':
+          $ref: '#/components/responses/expectationFailedError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /partner-contacts:
+    get:
+      tags:
+        - 'Partners'
+      description: 'Return list of contacts belonging to a partner along with the partner details itself'
+      summary: 'Get partner and contacts'
+      operationId: 'getCurrentPartnerContacts'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/getCurrentPartnerContacts'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /partners/{partnerId}/contacts:
+    get:
+      tags:
+        - 'Partners'
+      description: 'Return list of contacts belonging to a partner'
+      summary: 'Get partner contacts'
+      operationId: 'getPartnerContacts'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/partnerIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getPartnerContacts'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    post:
+      tags:
+        - 'Partners'
+      description: 'Create new partner contact'
+      summary: 'Create partner contacts'
+      operationId: 'postPartnerContacts'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/partnerIdPath'
+      requestBody:
+        $ref: '#/components/requestBodies/postPartnerContacts'
+      responses:
+        '200':
+          $ref: '#/components/responses/postPartnerContacts'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /partners/{partnerId}/contacts/{partnerContactId}:
+    delete:
+      tags:
+        - 'Partners'
+      description: 'Delete a contact belonging to a partner'
+      summary: 'Delete a partner contact'
+      operationId: 'deletePartnerContacts'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/partnerIdPath'
+        - $ref: '#/components/parameters/partnerContactIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/deletePartnerContacts'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /organizations/{orgId}/devices:
+    get:
+      tags:
+        - 'Devices'
+      description: 'Returns List of all devices in the organization with the given ID'
+      summary: 'Get organization devices'
+      operationId: 'getOrganizationDevices'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+        - $ref: '#/components/parameters/groupIdQuery'
+        - $ref: '#/components/parameters/nameQuery'
+        - $ref: '#/components/parameters/imeiQuery'
+        - $ref: '#/components/parameters/locatedQuery'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/offsetQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/getOrganizationDevices'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    post:
+      tags:
+        - 'Devices'
+      description: 'Add new device to the organization'
+      summary: 'Add a device'
+      operationId: 'postOrganizationDevices'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+      requestBody:
+        $ref: '#/components/requestBodies/postOrganizationDevices'
+      responses:
+        '200':
+          $ref: '#/components/responses/postOrganizationDevices'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '409':
+          $ref: '#/components/responses/conflictError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /organizations/{orgId}/devices/{imei}:
+    delete:
+      tags:
+        - 'Devices'
+      description: 'Delete a device from an organization'
+      summary: 'Delete a device'
+      operationId: 'deleteOrganizationDevices'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+        - $ref: '#/components/parameters/imeiPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/deleteOrganizationDevices'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /me:
+    get:
+      tags:
+        - 'Partners'
+        - 'Users'
+      description: 'Allows to retrieve the current authenticated entity'
+      summary: 'Get self info'
+      operationId: 'getMe'
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/getMe'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /organizations/{orgId}/groups:
+    get:
+      tags:
+        - 'Groups'
+      description: 'Returns List of all groups in the organization with the given ID'
+      summary: 'Get organization groups'
+      operationId: 'getOrganizationGroups'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getOrganizationGroups'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    post:
+      tags:
+        - 'Groups'
+      description: 'Create a new group in the organization with the given ID'
+      summary: 'Create group'
+      operationId: 'postOrganizationGroups'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+      requestBody:
+        $ref: '#/components/requestBodies/postOrganizationGroups'
+      responses:
+        '200':
+          $ref: '#/components/responses/postOrganizationGroups'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /audit-logs:
+    get:
+      tags:
+        - 'Audit logs'
+      description: 'This API is for retrieving audit logs of a requesting users organization by date (mandatory), organization ID (based on access permissions)'
+      summary: 'Retrieve organizations audit logs'
+      operationId: 'getAuditLogs'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/offsetQuery'
+        - $ref: '#/components/parameters/startQuery'
+        - $ref: '#/components/parameters/endQuery'
+        - $ref: '#/components/parameters/userIdQuery'
+        - $ref: '#/components/parameters/partnerIdQuery'
+        - $ref: '#/components/parameters/organizationIdQuery'
+        - $ref: '#/components/parameters/imeiQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/getAuditLogs'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /organizations/{orgId}/groups/{groupId}/devices:
+    post:
+      tags:
+        - 'Groups'
+      description:
+        'Add list of devices to a group with the given ID. Only device that belongs
+        to the same organization can be added to the group. If the device was already
+        added to other group prior to this call, it will be removed from that group
+        and added to the new group'
+      summary: 'Add devices to group'
+      operationId: 'postOrganizationGroupDevices'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+        - $ref: '#/components/parameters/groupIdPath'
+      requestBody:
+        $ref: '#/components/requestBodies/postOrganizationGroupDevices'
+      responses:
+        '200':
+          $ref: '#/components/responses/postOrganizationGroupDevices'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /organizations/{orgId}/webhooks:
+    get:
+      tags:
+        - 'Webhooks'
+      description: 'Returns List of webhooks configured for this organization'
+      summary: 'Get organization webhooks'
+      operationId: 'getOrganizationWebhooks'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getOrganizationWebhooks'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    post:
+      tags:
+        - 'Webhooks'
+      description: 'Allows to add a single device to the webhook subscription'
+      summary: 'Add device to webhook subscription'
+      operationId: 'postOrganizationWebhook'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+      requestBody:
+        $ref: '#/components/requestBodies/postOrganizationWebhook'
+      responses:
+        '200':
+          $ref: '#/components/responses/postOrganizationWebhook'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    put:
+      tags:
+        - 'Webhooks'
+      description: >
+        Replaces the entire list of devices subscribed to webhooks with a new list of devices (identified by their IMEI
+        numbers)
+      summary: 'Set or replace webhooks subscription'
+      operationId: 'putOrganizationWebhooks'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+      requestBody:
+        $ref: '#/components/requestBodies/putOrganizationWebhooks'
+      responses:
+        '200':
+          $ref: '#/components/responses/putOrganizationWebhooks'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /organizations/{orgId}/webhooks/{webhookId}:
+    delete:
+      tags:
+        - 'Webhooks'
+      description: 'Deletes a specific webhook within an organization'
+      summary: 'Delete a webhook'
+      operationId: 'deleteOrganizationWebhooks'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+        - $ref: '#/components/parameters/webhookIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/deleteOrganizationWebhooks'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /organizations:
+    get:
+      tags:
+        - 'Organizations'
+      security:
+        - bearerAuth: []
+      description: 'This endpoints allows to retrieve a list of organizations belonging to current authenticated entity'
+      summary: 'Get organization'
+      operationId: 'getOrganizations'
+      responses:
+        '200':
+          $ref: '#/components/responses/getOrganizations'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    post:
+      tags:
+        - 'Organizations'
+      description: 'This function is used to add a new organization to the organizations list - only a partner is allowed to interact with this API'
+      summary: 'Create new organization'
+      operationId: 'postOrganization'
+      security:
+        - bearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/postOrganization'
+      responses:
+        '200':
+          $ref: '#/components/responses/postOrganization'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /organizations/{orgId}:
+    get:
+      tags:
+        - 'Organizations'
+      description: 'Allows to retrieve a organization with the given ID'
+      summary: 'Get organization'
+      operationId: 'getOrganization'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getOrganization'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    patch:
+      tags:
+        - 'Organizations'
+      description: 'Allows to update an organization and its various properties, available - only a partner is allowed to interact with this API'
+      summary: 'Update organization'
+      operationId: 'patchOrganization'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/orgIdPath'
+      requestBody:
+        $ref: '#/components/requestBodies/patchOrganization'
+      responses:
+        '200':
+          $ref: '#/components/responses/patchOrganization'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /organizations/sso:
+    get:
+      tags:
+        - 'Organizations'
+      security:
+        - bearerAuth: []
+      description:
+        'This endpoint is used to authenticate the organization, a valid JWT token should be provided in authorization header. It must be used prior
+        to making any other API calls. Token obtained from this call should be inserted
+        in all other API calls in http header in the form of authorization: Bearer {token}.
+        This API call is only available for partner accounts, the same account email can not exist in other accounts'
+      summary: 'Organization SSO end point'
+      operationId: 'getOrganizationSso'
+      responses:
+        '200':
+          $ref: '#/components/responses/getOrganizationSso'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /device-health:
+    get:
+      tags:
+        - 'Health'
+      description: 'This API is used for health report of devices belong to the user. Partners can filter an organization devices by providing the Organization ID'
+      summary: 'Retrieve devices health report'
+      operationId: 'getDevicesHealth'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/offsetQuery'
+        - $ref: '#/components/parameters/lastConnectedAtStartQuery'
+        - $ref: '#/components/parameters/lastConnectedAtEndQuery'
+        - $ref: '#/components/parameters/lastRecordingUpdatedAtStartQuery'
+        - $ref: '#/components/parameters/lastRecordingUpdatedAtEndQuery'
+        - $ref: '#/components/parameters/lastRecordingHealthQuery'
+        - $ref: '#/components/parameters/partnerOrganizationIdQuery'
+        - $ref: '#/components/parameters/imeiQuery'
+        - $ref: '#/components/parameters/nameQuery'
+        - $ref: '#/components/parameters/deviceHealthSortQuery'
+        - $ref: '#/components/parameters/orderQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/getDevicesHealth'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /recipients/health:
+    get:
+      tags:
+        - 'Health'
+      description: 'This API is for retrieving health recipients configured by the user. Partners can filter recipients added specific to an organization by providing the organization ID'
+      summary: 'Retrieve health recipients'
+      operationId: 'getHealthRecipients'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/partnerOrganizationIdQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/getHealthRecipients'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    post:
+      tags:
+        - 'Health'
+      description: 'This API is for adding a new health recipient to recive health report email. Health recipient will frequently recieve email reports as per report interval specified in the configuration.'
+      summary: 'Create new health recipient'
+      operationId: 'postHealthRecipient'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/partnerOrganizationIdQuery'
+      requestBody:
+        $ref: '#/components/requestBodies/postHealthRecipient'
+      responses:
+        '200':
+          $ref: '#/components/responses/postHealthRecipient'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /recipients/health/{recipientId}:
+    delete:
+      tags:
+        - 'Health'
+      description: 'This API is for deleting an existing health recipient of given ID'
+      summary: 'Delete health recipient'
+      operationId: 'deleteHealthRecipient'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/recipientIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/deleteHealthRecipient'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /alarms:
+    get:
+      tags:
+        - 'Alarms'
+      description: 'This API is for retrieving alarms created for the user. Partner can filter alarms generated for an organizatoin by providing the Organization ID.'
+      summary: 'Retrieve alarms report'
+      operationId: 'getAlarms'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/offsetQuery'
+        - $ref: '#/components/parameters/partnerOrganizationIdQuery'
+        - $ref: '#/components/parameters/imeiQuery'
+        - $ref: '#/components/parameters/nameQuery'
+        - $ref: '#/components/parameters/alarmDefinitionNameQuery'
+        - $ref: '#/components/parameters/alarmDefinitionSeverityQuery'
+        - $ref: '#/components/parameters/readFilterQuery'
+        - $ref: '#/components/parameters/unreadFilterQuery'
+        - $ref: '#/components/parameters/openFilterQuery'
+        - $ref: '#/components/parameters/closeFilterQuery'
+        - $ref: '#/components/parameters/alarmsSortQuery'
+        - $ref: '#/components/parameters/orderQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/getAlarms'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /alarms/{alarmId}:
+    get:
+      tags:
+        - 'Alarms'
+      description: 'This API is for retrieving alarm of given alarm ID'
+      summary: 'Retrieve alarm of given alarm ID report'
+      operationId: 'getAlarm'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/alarmIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/getAlarm'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /alarms/{alarmId}/actions:
+    post:
+      tags:
+        - 'Alarms'
+      description: 'This API is for adding an alarm action to given alarm ID. Alarm action type can be one of "read", "close", "open"'
+      summary: 'Add new action to an alarm. Alarm action can be one of '
+      operationId: 'postAlarmAction'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/alarmIdPath'
+      requestBody:
+        $ref: '#/components/requestBodies/postAlarmAction'
+      responses:
+        '200':
+          $ref: '#/components/responses/postAlarmAction'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /alarms/{alarmId}/comments:
+    post:
+      tags:
+        - 'Alarms'
+      description: 'This API is for adding a comment to the alarm of given alarm ID'
+      summary: 'Add new comment to an alarm'
+      operationId: 'postAlarmComment'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/alarmIdPath'
+      requestBody:
+        $ref: '#/components/requestBodies/postAlarmComment'
+      responses:
+        '200':
+          $ref: '#/components/responses/postAlarmComment'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /recipients/alarms:
+    get:
+      tags:
+        - 'Alarms'
+      description: 'This API is for retrieving alarms recipients configured by the user. Partner can filter recipients added specific to an organization by providing the organization ID'
+      summary: 'Retrieve alarms recipients'
+      operationId: 'getAlarmsRecipients'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/partnerOrganizationIdQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/getAlarmsRecipients'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    post:
+      tags:
+        - 'Alarms'
+      description: 'This API is used to add a new alarms recipient to recieve alarms report email. Alarms recipient will frequently recieve email reports as per report interval specified in the configuration. Partner can add alarm recipient specific to an organization by providing the organization ID'
+      summary: 'Create new alarms recipient'
+      operationId: 'postAlarmsRecipient'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/partnerOrganizationIdQuery'
+      requestBody:
+        $ref: '#/components/requestBodies/postAlarmsRecipient'
+      responses:
+        '200':
+          $ref: '#/components/responses/postAlarmsRecipient'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+  /recipients/alarms/{recipientId}:
+    patch:
+      tags:
+        - 'Alarms'
+      description: 'This API is used to update alarms recipient configuration of given recipient ID'
+      summary: 'Update alarms recipient configuration'
+      operationId: 'patchAlarmsRecipient'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/recipientIdPath'
+      requestBody:
+        $ref: '#/components/requestBodies/patchAlarmsRecipient'
+      responses:
+        '200':
+          $ref: '#/components/responses/patchAlarmsRecipient'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    delete:
+      tags:
+        - 'Alarms'
+      description: 'This API is for deleting alarms recipient of given recipient ID'
+      summary: 'Delete alarms recipient'
+      operationId: 'deleteAlarmsRecipient'
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/recipientIdPath'
+      responses:
+        '200':
+          $ref: '#/components/responses/deleteAlarmsRecipient'
+        '400':
+          $ref: '#/components/responses/badRequestError'
+        '401':
+          $ref: '#/components/responses/unauthorizedError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '404':
+          $ref: '#/components/responses/notFoundError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  requestBodies:
+    putDeviceRetentionConfig:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - config
+            properties:
+              config:
+                $ref: '#/components/schemas/retentionConfig'
+    patchDevice:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                $ref: '#/components/schemas/deviceName'
+    postAuthenticate:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - email
+              - password
+            properties:
+              email:
+                $ref: '#/components/schemas/email'
+              password:
+                $ref: '#/components/schemas/password'
+    postOrganizationUsers:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - email
+              - password
+              - role
+            properties:
+              email:
+                $ref: '#/components/schemas/email'
+              password:
+                $ref: '#/components/schemas/password'
+              role:
+                $ref: '#/components/schemas/role'
+    postOrganizationDevicesCalibrateAccelerometer:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              imeis:
+                type: array
+                items:
+                  $ref: '#/components/schemas/imei'
+              groups:
+                type: array
+                items:
+                  $ref: '#/components/schemas/groupId'
+              ungrouped:
+                type: boolean
+    postBulkDevices:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              required:
+                - imei
+                - name
+              properties:
+                imei:
+                  $ref: '#/components/schemas/imei'
+                name:
+                  $ref: '#/components/schemas/deviceName'
+                groupId:
+                  $ref: '#/components/schemas/groupId'
+    postVirtualEvent:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - time
+            properties:
+              time:
+                description: 'Event date and time in format of ISO 8601'
+                $ref: '#/components/schemas/time'
+              mediaType:
+                description: 'Determines if the device will upload video or a snapshot'
+                type: string
+                default: video
+                enum:
+                  - video
+                  - snapshot
+              durationSeconds:
+                description: 'Length of video in seconds (discarded for snapshot type)'
+                type: number
+                minimum: 1
+                maximum: 86400
+              quality:
+                description: 'Quality of video event - standard or high'
+                type: string
+                enum:
+                  - standard
+                  - high
+              cameraId:
+                description: 'Camera ID'
+                type: number
+              metadata:
+                description: 'Event metadata'
+                type: string
+    putBulkEventConfig:
+      required: true
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/putBulkEventConfigImeis'
+              - $ref: '#/components/schemas/putBulkEventConfigGroups'
+    putEventConfig:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/eventConfig'
+    putDeviceConfig:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/deviceConfig'
+    putBulkDeviceConfig:
+      required: true
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/putBulkDeviceConfigOrganization'
+              - $ref: '#/components/schemas/putBulkDeviceConfigImeis'
+    setDeviceGeoFences:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            description:
+              'This array contains configuration of all geofence events
+              for the given device'
+            items:
+              $ref: '#/components/schemas/geofence'
+    postAssociatedDevices:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              imeis:
+                type: array
+                description: 'list of IMEIs'
+                items:
+                  $ref: '#/components/schemas/imei'
+    postPartnerContacts:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/partnerContact'
+              - type: object
+                required:
+                  - password
+                properties:
+                  password:
+                    $ref: '#/components/schemas/password'
+    postOrganizationDevices:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/device'
+    postOrganizationGroups:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/groupToCreate'
+    postOrganizationGroupDevices:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            description:
+              'This array contains imeis of devices wthat will be added
+              to the given group. If those devices already belogs to another groups,
+              it will be removed from those groups'
+            items:
+              $ref: '#/components/schemas/imei'
+    postOrganizationWebhook:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/webhook'
+    putOrganizationWebhooks:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            description: 'This array contains webhooks'
+            items:
+              $ref: '#/components/schemas/webhook'
+    postOrganization:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                $ref: '#/components/schemas/organizationName'
+    patchOrganization:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                $ref: '#/components/schemas/organizationName'
+              purgeDays:
+                $ref: '#/components/schemas/organizationPurgeDays'
+              purgeDaysFrontCamera:
+                $ref: '#/components/schemas/organizationPurgeDays'
+              purgeDaysRearCamera:
+                $ref: '#/components/schemas/organizationPurgeDays'
+              purgeDaysAuxiliaryCameras:
+                $ref: '#/components/schemas/organizationPurgeDays'
+    patchDeviceCameras:
+      description: Array of objects containing camera ID and name
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            uniqueItems: true
+            minItems: 1
+            maxItems: 10
+            items:
+              type: object
+              required:
+                - cameraId
+                - name
+              properties:
+                cameraId:
+                  $ref: '#/components/schemas/cameraId'
+                name:
+                  type: string
+                  minimum: 1
+                  maximum: 191
+                  nullable: true
+    postHealthRecipient:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/healthRecipient'
+    postAlarmAction:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/alarmAction'
+    postAlarmComment:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/alarmComment'
+    postAlarmsRecipient:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/alarmsRecipient'
+    patchAlarmsRecipient:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            description: 'description'
+            properties:
+              reportIntervalSeconds:
+                $ref: '#/components/schemas/alarmsReportIntervalSeconds'
+              alarmDefinitions:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                  properties:
+                    id:
+                      type: number
+                      description: 'ID of the alarm definition'
+                      example: 625
+  responses:
+    patchDeviceCameras:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    postAuthenticate:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: object
+                properties:
+                  token:
+                    $ref: '#/components/schemas/token'
+                  organizationId:
+                    $ref: '#/components/schemas/organizationId'
+    postOrganizationDevicesCalibrateAccelerometer:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    patchDevice:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    putDeviceRetentionConfig:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    getDeviceRetentionConfig:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                required:
+                  - config
+                properties:
+                  config:
+                    $ref: '#/components/schemas/retentionConfig'
+    getDeviceCameras:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    cameraId:
+                      $ref: '#/components/schemas/cameraId'
+    getDeviceCameraSnapshot:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: string
+                description: 'Receive a URL to download the requested snapshot.'
+                example: 'https://sample.s3.aws.com/123/123.mp4?access_key=1234'
+
+    getDeviceRecordingRanges:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/cameraRangeObject'
+    deletePartnerContacts:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    postPartnerContacts:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/extendedPartnerContact'
+    postVirtualEvent:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    putBulkEventConfig:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    putEventConfig:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    getEventConfig:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/eventConfig'
+    putDeviceConfig:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    getDeviceConfig:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/deviceConfig'
+    postBulkDevices:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                properties:
+                  accepted:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/imei'
+                  rejected:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/imei'
+    postDeviceReboot:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    postDeviceOtgSettings:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - enabled
+            properties:
+              enabled:
+                type: boolean
+    postAssociatedDevices:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/associatedDevices'
+    getDeviceFormatStorage:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    postDeviceConnectMedia:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/connectMedia'
+    getDeviceEvents:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/event'
+    getDeviceEvent:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/event'
+    deleteDeviceEvent:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/eventDeleted'
+    getDeviceGeoFences:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/geofence'
+    setDeviceGeoFences:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    getDeviceEventFileLink:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: object
+                required:
+                  - url
+                properties:
+                  url:
+                    type: string
+                    description: 'Download URL of the requested file'
+                    example: 'https://sample.s3.aws.com/123/123.mp4?access_key=1234'
+    getDeviceTrips:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/trip'
+    getDeviceGps:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                description:
+                  'Array that contains all GPS points that belong to the
+                  given trip'
+                items:
+                  $ref: '#/components/schemas/gpsPoint'
+    getDeviceTelemetry:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/deviceTelemetry'
+    getDeviceCameraTelemetry:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/deviceCameraTelemetry'
+    getOrganizationDevices:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/extendedDevice'
+              metadata:
+                $ref: '#/components/schemas/metadata'
+    getOrganizationSso:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - token
+            properties:
+              token:
+                type: string
+    getOrganizations:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/extendedOrganization'
+    getMe:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: object
+                required:
+                  - me
+                  - entity
+                properties:
+                  me:
+                    oneOf:
+                      - $ref: '#/components/schemas/partner'
+                      - $ref: '#/components/schemas/user'
+                  entity:
+                    $ref: '#/components/schemas/entity'
+    getOrganization:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/extendedOrganization'
+    getAuditLogs:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+              - metadata
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/auditLog'
+              metadata:
+                $ref: '#/components/schemas/metadata'
+    getOrganizationGroups:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/group'
+    postOrganizationDevices:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    postOrganizationGroups:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    postOrganizationGroupDevices:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    postOrganization:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - organizationId
+              - ssoSecret
+            properties:
+              organizationId:
+                $ref: '#/components/schemas/organizationId'
+              ssoSecret:
+                type: string
+                description: >
+                  This SSO secret can be used to verify authenticity of HTTP Post events subscribed to this organization.<br><br>
+                  The Header X-Surfsight-Signature will be added to every HTTP Post sent for subscriptions.<br><br>
+                  This signature is dependent on the destination URL, ssoSecret and the content of the request body, making every request signature unique.<br><br>
+                  You can verify that authenticity of the HTTP post by creating the same signature and comparing the result with the X-Surfsight-Signature Header as shown below.<br><br>
+                  The signature is created with Hmac – sha512 algorithm, applied directly on the ssoSecret , cyphered/encoded with a stringified request body + destination URL, and converted to hexa-decimal encoding.<br><br>
+                  For example, using the crypto package:<br><br>
+                  Signature = crypto.createHmac(sha512, mySsoSecret).update(Json.stringify(request.body) + URL ).digest(hex)<br><br>
+                  The outcome for ‘Signature’ should look like this:<br><br>
+                  29c4198c5e3da799887deaf0b0450bac8880efc0769cb79b97138ce9888a4308c7211415879152fdc4a14933c77cd4d531e71a29008214360ce340ccf49b87c8<br><br>
+                  You can verify that authenticity of the HTTP post by creating the same signature and comparing the result with the X-Surfsight-Signature Header
+    patchOrganization:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    getOrganizationWebhooks:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                description:
+                  'This array contains all webhooks configured for the
+                  given organization'
+                items:
+                  $ref: '#/components/schemas/webhook'
+    postOrganizationWebhook:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    putOrganizationWebhooks:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    deleteOrganizationWebhooks:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    deleteOrganizationDevices:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    postOrganizationUsers:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    getCurrentPartnerContacts:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/extendedPartnerContact'
+    getPartnerContacts:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/extendedPartnerContact'
+    getDevicesHealth:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+              - metadata
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/deviceHealth'
+              metadata:
+                $ref: '#/components/schemas/metadata'
+    getHealthRecipients:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/extendedHealthRecipient'
+    postHealthRecipient:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/extendedHealthRecipient'
+    deleteHealthRecipient:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    getAlarms:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+              - metadata
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/alarm'
+              metadata:
+                $ref: '#/components/schemas/metadata'
+    getAlarm:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/alarm'
+    postAlarmAction:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/extendedAlarmAction'
+    postAlarmComment:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/extendedAlarmComment'
+    getAlarmsRecipients:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/extendedAlarmsRecipient'
+    postAlarmsRecipient:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/extendedAlarmsRecipient'
+    patchAlarmsRecipient:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/extendedAlarmsRecipient'
+    deleteAlarmsRecipient:
+      description: 'Successful operation'
+      content:
+        application/json:
+          schema:
+            type: object
+    badRequestError:
+      description: 'Bad request error'
+      content:
+        application/json:
+          schema:
+            title: 'Bad request error'
+            allOf:
+              - $ref: '#/components/schemas/error'
+            example:
+              error: 'BadRequestError'
+              message: 'bad request error: {message}'
+              requestId: '11af5b37-e038-42e0-8dcf-dc8c4aefc000'
+    unauthorizedError:
+      description: 'Unauthorized error'
+      content:
+        application/json:
+          schema:
+            title: 'Unauthorized error'
+            allOf:
+              - $ref: '#/components/schemas/error'
+            example:
+              error: 'UnauthorizedError'
+              message: 'unauthorized error'
+              requestId: '11af5b37-e038-42e0-8dcf-dc8c4aefc000'
+    forbiddenError:
+      description: 'Forbidden error'
+      content:
+        application/json:
+          schema:
+            title: 'Forbidden error'
+            allOf:
+              - $ref: '#/components/schemas/error'
+            example:
+              error: 'ForbiddenError'
+              message: 'forbidden error'
+              requestId: '11af5b37-e038-42e0-8dcf-dc8c4aefc000'
+    notFoundError:
+      description: 'Not found error'
+      content:
+        application/json:
+          schema:
+            title: 'Not found error'
+            allOf:
+              - $ref: '#/components/schemas/error'
+            example:
+              error: 'NotFoundError'
+              message: 'not found error: {message}'
+              requestId: '11af5b37-e038-42e0-8dcf-dc8c4aefc000'
+    conflictError:
+      description: 'Conflict error'
+      content:
+        application/json:
+          schema:
+            title: 'Conflict error'
+            allOf:
+              - $ref: '#/components/schemas/error'
+            example:
+              error: 'ConflictError'
+              message: 'conflict error: {message}'
+              requestId: '11af5b37-e038-42e0-8dcf-dc8c4aefc000'
+    expectationFailedError:
+      description: 'Expectation failed error'
+      content:
+        application/json:
+          schema:
+            title: 'Expectation failed error'
+            allOf:
+              - $ref: '#/components/schemas/error'
+            example:
+              error: 'ExpectationFailedError'
+              message: 'expectation failed error: {message}'
+              requestId: '11af5b37-e038-42e0-8dcf-dc8c4aefc000'
+    internalServerError:
+      description: 'Internal server error'
+      content:
+        application/json:
+          schema:
+            title: 'Internal server error'
+            allOf:
+              - $ref: '#/components/schemas/error'
+            example:
+              error: 'UnknownError'
+              message: 'unknown error has occurred'
+              requestId: '11af5b37-e038-42e0-8dcf-dc8c4aefc000'
+  parameters:
+    imeiPath:
+      in: path
+      name: imei
+      description: 'Device IMEI'
+      required: true
+      schema:
+        $ref: '#/components/schemas/imei'
+    cameraIdPath:
+      in: path
+      name: cameraId
+      description: 'Camera ID'
+      required: true
+      schema:
+        type: string
+        description: 'Camera ID'
+        example: '2'
+    partnerIdPath:
+      in: path
+      name: partnerId
+      description: 'Partner ID'
+      required: true
+      schema:
+        type: string
+        description: 'Partner ID'
+        example: '62'
+    partnerIdQuery:
+      in: query
+      name: partnerId
+      description: 'Partner ID'
+      required: false
+      schema:
+        type: string
+        description: 'Partner ID'
+        example: '62'
+    partnerContactIdPath:
+      in: path
+      name: partnerContactId
+      description: 'Partner Contact ID'
+      required: true
+      schema:
+        type: string
+        description: 'Partner Contact ID'
+        example: '62'
+    orgIdPath:
+      in: path
+      name: orgId
+      description: 'Organization ID'
+      required: true
+      schema:
+        type: string
+        description: 'Organization ID'
+        example: '62'
+    organizationIdQuery:
+      in: query
+      name: orgId
+      description: 'Organization ID'
+      required: false
+      schema:
+        $ref: '#/components/schemas/organizationId'
+    partnerOrganizationIdQuery:
+      in: query
+      name: organizationId
+      description: 'Organization ID of partner organization. This is optional parameter for partner. Objects will be related to the partner organization. It is not required for user'
+      required: false
+      schema:
+        $ref: '#/components/schemas/organizationIdString'
+    webhookIdPath:
+      in: path
+      name: webhookId
+      description: 'Webhook ID'
+      required: true
+      schema:
+        type: string
+        description: 'Webhook ID'
+        example: 1
+    eventIdPath:
+      in: path
+      name: eventId
+      description: 'Event ID'
+      required: true
+      schema:
+        type: string
+        description: 'Event ID'
+        example: '62'
+    groupIdPath:
+      in: path
+      name: groupId
+      description: 'Group ID'
+      required: true
+      schema:
+        type: string
+        description: 'Group ID'
+        example: '62'
+    groupIdQuery:
+      in: query
+      name: groupId
+      description: 'Group ID'
+      schema:
+        type: string
+        description: 'Group ID'
+        example: '62'
+    recipientIdPath:
+      in: path
+      name: recipientId
+      description: 'Recipient ID'
+      required: true
+      schema:
+        type: string
+        pattern: '^[1-9]\d*$'
+        description: 'Recipient ID'
+        example: '25'
+    startQuery:
+      in: query
+      name: start
+      required: true
+      description: 'Start Date and Time in the form of ISO 8601'
+      schema:
+        $ref: '#/components/schemas/start'
+    endQuery:
+      in: query
+      name: end
+      required: true
+      description: 'End Date and Time in the form of ISO 8601'
+      schema:
+        $ref: '#/components/schemas/end'
+    userIdQuery:
+      in: query
+      description: 'User ID'
+      name: userId
+      required: false
+      schema:
+        $ref: '#/components/schemas/userIdString'
+    fileIdQuery:
+      in: query
+      name: fileId
+      required: true
+      description: 'File ID of the requested file. Can be obtained either from
+        /devices/{imei}/events API response or by calculation of unit timestamp
+        (seconds from epoch) of the event (applicable only to virtual events)'
+      schema:
+        $ref: '#/components/schemas/fileId'
+    fileTypeQuery:
+      in: query
+      name: fileType
+      required: true
+      description: 'File type of the requested file. Can be either obtained
+        from the response of /devices/{imei}/events API or can be set to
+        the value of video/snapshot it case the device configuration is
+        predefined'
+      schema:
+        $ref: '#/components/schemas/fileType'
+    cameraIdQuery:
+      in: query
+      name: cameraId
+      required: true
+      description: 'Camera ID of the requested file. Can be either obtained
+        from the response of /devices/{imei}/events API or can be set to
+        the ID of the required camera in case the cameras configuration is
+        predefined (1 - Front facing camera, 2 - Rear facing camera, 50+ -
+        auxiliary cameras)'
+      schema:
+        description: 'ID of the camera this corresponds to the attached file'
+        type: string
+        example: '1'
+    nameQuery:
+      in: query
+      name: name
+      description: 'Name'
+      schema:
+        type: string
+        description: 'Name'
+        example: 'Mike'
+    imeiQuery:
+      in: query
+      name: imei
+      description: 'IMEI'
+      schema:
+        type: string
+        description: 'IMEI'
+        example: '12345678'
+    locatedQuery:
+      in: query
+      name: located
+      description: 'Located devices only'
+      allowEmptyValue: true
+      schema:
+        type: string
+        description: 'Located devices only'
+    lastConnectedAtStartQuery:
+      in: query
+      name: lastConnectedAtStart
+      required: false
+      description: 'Start Date and Time of "last connected" in the form of ISO 8601. Required when lastConnectedAtEnd is provided.'
+      schema:
+        $ref: '#/components/schemas/lastConnectedAt'
+    lastConnectedAtEndQuery:
+      in: query
+      name: lastConnectedAtEnd
+      required: false
+      description: 'End Date and Time of "last connected" in the form of ISO 8601. Required when lastConnectedAtStart is provided'
+      schema:
+        $ref: '#/components/schemas/lastConnectedAt'
+    lastRecordingUpdatedAtStartQuery:
+      in: query
+      name: lastRecordingUpdatedAtStart
+      required: false
+      description: 'Start Date and Time of "last recording updated" in the form of ISO 8601.  Required when lastRecordingUpdatedAtEnd is provided'
+      schema:
+        $ref: '#/components/schemas/lastRecordingUpdatedAt'
+    lastRecordingUpdatedAtEndQuery:
+      in: query
+      name: lastRecordingUpdatedAtEnd
+      required: false
+      description: 'End Date and Time of "last recording updated" in the form of ISO 8601. Required when lastRecordingUpdatedAtStart is provided'
+      schema:
+        $ref: '#/components/schemas/lastRecordingUpdatedAt'
+    lastRecordingHealthQuery:
+      in: query
+      name: lastRecordingHealth
+      description: 'This flag can be used for filtering healthy devices only'
+      allowEmptyValue: true
+      schema:
+        type: string
+        description: 'Located devices only'
+    deviceHealthSortQuery:
+      in: query
+      name: sort
+      required: false
+      description: 'Sort for device health'
+      schema:
+        title: 'Sort Device Health'
+        description: 'Sort for Device Health'
+        type: string
+        enum:
+          - name
+          - imei
+          - lastConnectedAt
+          - lastRecordingHealth
+          - lastRecordingUpdatedAt
+    alarmIdPath:
+      in: path
+      name: alarmId
+      description: 'Alarm ID'
+      required: true
+      schema:
+        type: string
+        description: 'Alarm ID'
+        pattern: '^[1-9]\d*$'
+        example: '62'
+    alarmDefinitionNameQuery:
+      in: query
+      name: alarmDefinitionName
+      required: false
+      description: 'Filter by alarm definition name'
+      schema:
+        title: 'Alarm definition name'
+        type: string
+        minLength: 2
+    alarmDefinitionSeverityQuery:
+      in: query
+      name: alarmDefinitionSeverity
+      required: false
+      description: 'Filter by alarm definition severity'
+      schema:
+        title: 'Alarm definition severity'
+        type: string
+        pattern: '^[1-9]\d*$'
+    readFilterQuery:
+      in: query
+      name: read
+      description: 'Filter alarms that are read'
+      allowEmptyValue: true
+      schema:
+        title: 'Read'
+        type: string
+    unreadFilterQuery:
+      in: query
+      name: unread
+      description: 'Filter alarms that are unread'
+      allowEmptyValue: true
+      schema:
+        title: 'Unread'
+        type: string
+    closeFilterQuery:
+      in: query
+      name: close
+      description: 'Filter alarms that are closed'
+      allowEmptyValue: true
+      schema:
+        title: 'Close'
+        type: string
+    openFilterQuery:
+      in: query
+      name: open
+      description: 'Filter alarms that are opened'
+      allowEmptyValue: true
+      schema:
+        title: 'Open'
+        type: string
+    alarmsSortQuery:
+      in: query
+      name: sort
+      required: false
+      description: 'Sort for alarms'
+      schema:
+        title: 'Sort for Alarms'
+        description: 'Sort for alarms'
+        type: string
+        enum:
+          - name
+          - imei
+          - organizationName
+          - partnerName
+          - alarmDefinitionSeverity
+          - alarmDefinitionName
+          - createdAt
+    orderQuery:
+      in: query
+      name: order
+      description: 'Order for pagination'
+      schema:
+        title: 'Order'
+        description: 'Order for pagination'
+        type: string
+        enum:
+          - asc
+          - desc
+        default: 'desc'
+    limitQuery:
+      in: query
+      name: limit
+      description: 'Limit for pagination'
+      schema:
+        description: 'Limit for pagination'
+        type: string
+        pattern: '^[1-9]\d*$'
+        default: '0'
+        example: '1'
+    offsetQuery:
+      in: query
+      name: offset
+      description: 'Offset for pagination'
+      schema:
+        description: 'Offset for pagination'
+        type: string
+        pattern: '^[1-9]\d*$'
+        default: '0'
+        example: '1'
+  schemas:
+    imei:
+      title: 'IMEI'
+      description: 'Device IMEI'
+      type: string
+      example: '357660101000198'
+    firmwareVersion:
+      title: 'Firmware version'
+      description: 'Device Firmware version'
+      type: string
+      example: '3.9.53'
+    deviceModel:
+      title: 'Device Model'
+      description: 'Device Model'
+      type: string
+      example: 'AI-12'
+    simNetworkType:
+      title: 'SIM Network Type'
+      description: 'SIM Network Type'
+      type: string
+      example: '4G'
+    simOperator:
+      title: 'Mobile Operator'
+      description: 'Mobile Operator'
+      type: string
+      example: 'Cellcom IL'
+    simState:
+      title: 'SIM State'
+      description: 'The device SIM State'
+      type: string
+      enum:
+        - ready
+        - absent
+        - unknown
+        - network locked
+        - PIN required
+        - PUR required
+      example: 'ready'
+    calibrationCompleted:
+      title: 'Accelerometer Calibration State'
+      description: 'The device Accelerometer Calibration State'
+      type: boolean
+    sdCardInserted:
+      title: 'Is SD card inserted'
+      description: 'The device SD card is inserted'
+      type: boolean
+    sdCardCapacityBytes:
+      title: 'SD Card Size'
+      description: 'The SD Card Size, Bytes'
+      type: integer
+      example: 127817449472
+    sdCardFreeBytes:
+      title: 'SD Card Free Space'
+      description: 'The SD Card Free Space, Bytes'
+      type: integer
+      example: 46724284416
+    organizationId:
+      title: 'Organization ID'
+      description: 'Organization ID'
+      type: number
+    organizationIdString:
+      title: 'Organization ID'
+      description: 'Organization ID as string'
+      type: string
+      pattern: '^[1-9]\d*$'
+    partnerId:
+      title: 'Partner ID'
+      description: 'Partner ID'
+      type: number
+    userId:
+      title: 'User ID'
+      description: 'User ID'
+      type: number
+    userIdString:
+      title: 'User ID'
+      description: 'User ID as string'
+      type: string
+    organizationPurgeDays:
+      title: 'Purges period'
+      description: 'This field represent the the period for organizations data retention in days'
+      type: number
+      minimum: 1
+      maximum: 120
+      example: 103
+    organizationName:
+      title: 'Organization Name'
+      description: 'Organization Name'
+      type: string
+      example: 'Company Name'
+    partnerName:
+      title: 'Partner Name'
+      description: 'Partner Name'
+      type: string
+      example: 'Partner Name'
+    token:
+      title: 'Token'
+      description: 'Authentication token'
+      type: string
+      example: 'zskMdo9EBahb4lx4wX3GQKmxC6yOZImB1WuRa8Bbqtt'
+    email:
+      title: 'Email'
+      description: 'Email address'
+      type: string
+      format: email
+      example: 'email@email.com'
+    password:
+      title: 'Password'
+      description: 'Password'
+      type: string
+      format: password
+      example: '********'
+    entity:
+      title: 'Entity type'
+      description: 'Determines the current authenticated entity type'
+      type: string
+      enum:
+        - partner
+        - user
+    role:
+      type: string
+      enum:
+        - restricted
+        - user
+        - administrator
+        - supervisor
+    start:
+      title: 'Start Date and Time'
+      description: 'Date time in the form of ISO 8601'
+      type: string
+      format: date-time
+      example: '2020-01-01T14:48:00.000Z'
+    end:
+      title: 'End Date and Time'
+      description: 'Date time in the form of ISO 8601'
+      type: string
+      format: date-time
+      example: '2020-01-01T14:48:00.000Z'
+    cameraRangeObject:
+      title: 'Camera - time intervals object'
+      description: 'Contains camera ID and time intervals with available recordings'
+      type: object
+      required:
+        - cameraId
+        - intervals
+      properties:
+        cameraId:
+          type: number
+          description: 'Id of the camera attached to the device. 1 - Built-in Front camera, 2 - Built-in Rear camera, 50+ are auxiliary cameras'
+        intervals:
+          type: array
+          description: 'Array of time intervals with available recordings for the given cameraId'
+          items:
+            type: object
+            required:
+              - start
+              - end
+            properties:
+              start:
+                $ref: '#/components/schemas/start'
+              end:
+                $ref: '#/components/schemas/end'
+    latitude:
+      title: 'Latitude'
+      description: 'GPS latitude value'
+      type: number
+      minimum: -90
+      maximum: 90
+      example: 32.0598671
+    longitude:
+      title: 'Longitude'
+      description: 'GPS longitude value'
+      type: number
+      minimum: -180
+      maximum: 180
+      example: 34.7827316
+    altitude:
+      title: 'Altitude'
+      description: 'GPS altitude value'
+      type: number
+      maximum: 10000
+      example: 234.22
+    speed:
+      title: 'Speed'
+      description: 'Speed value in meters per second units'
+      type: number
+      example: 22.51
+    lastSeenOnline:
+      title: 'Last seen online'
+      description:
+        'The most recent time when the given device was connected to the cloud
+        service in ISO 8601 format. This value is updated once in every 5 minutes.
+        When the device is in online mode, this value can be up to 5 minutes earlier
+        than the moment'
+      type: string
+      format: date-time
+      example: '2020-01-01T14:48:00.000Z'
+    connectionStatus:
+      title: 'Connection Status'
+      description:
+        'Device connection status which can be online/standby/offline. In online
+        status the device is fully functional, in standby status the device is connected to
+        the cloud service, but its cameras are disabled, so live video functionality is not
+        available in this state. Offline state means that the device is not connected to
+        the cloud service'
+      type: string
+      enum:
+        - online
+        - standby
+        - offline
+    eventConfig:
+      title: 'Events configuration object'
+      description:
+        'This object contains events configuration data of the device such as
+        vehicle type, additional data types for the generated events (video/snapshot), etc.'
+      type: object
+      required:
+        - vehicleType
+        - events
+      properties:
+        vehicleType:
+          $ref: '#/components/schemas/vehicleType'
+        events:
+          type: array
+          description:
+            'This array contains all enabled events and its configurations, all
+            event types that are not in this array are disabled. Adding and removing
+            geofences is available through geofence API. This API allows only configuring
+            the attachment type for any geofence event'
+          items:
+            $ref: '#/components/schemas/eventObject'
+    eventObject:
+      type: object
+      description: 'Configuration of a single event. dataType fields are
+        mandatory for all types of event. speedLimit field is applicable only when
+        eventType is set to speedLimit. lat, lon, radius fields are applicable only when
+        eventType is set to geoFence'
+      required:
+        - eventType
+        - dataType
+      properties:
+        eventType:
+          $ref: '#/components/schemas/eventType'
+        dataType:
+          $ref: '#/components/schemas/dataType'
+        speedLimit:
+          $ref: '#/components/schemas/speedLimit'
+    vehicleType:
+      title: 'Vehicle type'
+      description: 'Type of the vehicle'
+      type: string
+      enum:
+        - Private
+        - Van
+        - Trailer
+    eventType:
+      title: 'Event type'
+      description: 'Type of event'
+      type: string
+      enum:
+        - acceleration
+        - accOff
+        - accOn
+        - activated
+        - button
+        - collision
+        - coreConnection
+        - coverOpened
+        - deceleration
+        - distractedDriving
+        - geoFence
+        - jolt
+        - shakingEnded
+        - shakingStarted
+        - sharpTurnLeft
+        - sharpTurnRight
+        - speedLimit
+        - powerDisconnectAlarm
+        - smoking
+        - foodDrink
+        - cellPhoneUse
+        - driverUnbelted
+        - smokingBeep
+        - foodDrinkBeep
+        - cellPhoneUseBeep
+        - driverUnbeltedBeep
+        - distractedDrivingBeep
+        - virtualEvent
+        - wrongPinCode
+        - gsensorHigh
+        - gsensorRegular
+        - accident
+    dataType:
+      title: 'Data type'
+      description:
+        'Type of data that will be attached to event when this type of event
+        is generated. Device may not attach this data to an event in case there was
+        overuse of data profile.'
+      type: string
+      enum:
+        - none
+        - snapshot
+        - video
+    speedLimit:
+      title: 'Speed limit'
+      description:
+        'Speed limit in km/h. When a vehicle reaches this speed, an event
+        of type speedLimit will be generated. Applies only to speedLimit event type'
+      type: number
+      example: 120
+    deviceConfig:
+      title: 'Device configuration'
+      description: 'This object contains various configuration parameters of the device'
+      type: object
+      properties:
+        distractedDriver:
+          description: 'Distracted driver functionality configuration'
+          type: object
+          required:
+            - value
+          properties:
+            value:
+              description: 'Enables/disables this functionality'
+              type: boolean
+        liveVideo:
+          description: 'Live video functionality configuration'
+          type: object
+          required:
+            - value
+          properties:
+            value:
+              description: 'Enables/disables this functionality'
+              type: boolean
+        driverCamera:
+          description: 'Driver camera configuration'
+          type: object
+          required:
+            - value
+          properties:
+            value:
+              description:
+                'Enables/disables the driver (in-cabin) camera. Note, if the
+                driver camera is disabled, all functionalities related to the driver
+                camera will also not work, for example distracted driver or in-cabin
+                camera recording'
+              type: boolean
+        textOverlay:
+          description: 'Text overlay functionality configuration'
+          type: object
+          required:
+            - value
+          properties:
+            value:
+              description: 'Enables/disables this functionality'
+              type: boolean
+        inCabinCameraRecording:
+          description: 'In cabin camera recording functionality configuration'
+          type: object
+          required:
+            - value
+          properties:
+            value:
+              description: 'Enables/disables this functionality'
+              type: boolean
+        driverPosition:
+          description: 'Driver position setting'
+          type: object
+          required:
+            - value
+          properties:
+            value:
+              description:
+                'Determines if the driver is sitting on the left/right side of
+                the vehicle. Must be set correctly for proper distracted driver functioning'
+              type: string
+              enum:
+                - left
+                - right
+        speedUnits:
+          description: 'Speed units setting'
+          type: object
+          required:
+            - value
+          properties:
+            value:
+              description: 'Defines which units will be used for speed measurement'
+              type: string
+              enum:
+                - mph
+                - kmh
+        audioAlarms:
+          description: 'Audio alarms setting configuration'
+          type: object
+          required:
+            - value
+          properties:
+            value:
+              description: 'Enables/disables this setting'
+              type: boolean
+        notifyLiveStreaming:
+          description: 'Notify live streaming setting configuration'
+          type: object
+          required:
+            - value
+          properties:
+            value:
+              description:
+                'Enables/disables device on-screen notification when someone
+                is viewing live video from this device'
+              type: boolean
+        adminPin:
+          description: 'Admin PIN setting configuration'
+          type: object
+          required:
+            - value
+          properties:
+            value:
+              description: 'Is used to set the admin PIN'
+              type: string
+              example: '1234'
+        driverPin:
+          description: 'Driver PIN setting configuration'
+          type: object
+          required:
+            - value
+          properties:
+            value:
+              description: 'Is used to set the driver PIN'
+              type: string
+              example: '1234'
+        brightness:
+          description: 'Screen brightness setting configuration'
+          type: object
+          required:
+            - value
+          properties:
+            value:
+              description:
+                'Is used to set the screen brightness. Values between 0-255
+                are valid'
+              type: number
+              example: 128
+              minimum: 0
+              maximum: 255
+        dateTimeUnits:
+          description: 'Date/time units setting'
+          type: object
+          required:
+            - value
+          properties:
+            value:
+              description: 'Defines which units will be used for date and time.
+                Values "us" and "eu" are valid. "us" means the US units, "eu" -
+                metric units'
+              type: string
+              enum:
+                - us
+                - eu
+        voiceRecording:
+          description: 'Voice recording setting configuration'
+          type: object
+          required:
+            - value
+          properties:
+            value:
+              description: 'Enables/disables device this setting'
+              type: boolean
+        standby:
+          description: 'Standby setting'
+          type: object
+          required:
+            - timeout
+          properties:
+            timeout:
+              description:
+                'Sets the standby timout in minute units. This timeout
+                determines the time period after which the camera will enter the
+                standby mode in case there were no vehicle movement during this
+                period'
+              type: number
+              example: 10
+              minimum: 1
+              maximum: 60
+        hotSpot:
+          description: 'HotSpot configuration'
+          type: object
+          required:
+            - internetAccess
+          properties:
+            internetAccess:
+              description: 'Enables/disables internet access via the device hotspot'
+              type: boolean
+        privacy:
+          description: 'Privacy settings for device and cameras'
+          type: object
+          properties:
+            gpsEnabled:
+              description: 'Whether to enable gps tracking or not'
+              type: boolean
+            mvaiEnabled:
+              description: 'Whether to enable mvai or not'
+              type: boolean
+            cameras:
+              description: 'Settings for each camera'
+              type: array
+              items:
+                description: 'Contains privacy settings for a certain camera'
+                type: object
+                required:
+                  - cameraId
+                properties:
+                  cameraId:
+                    $ref: '#/components/schemas/cameraId'
+                  recordingEnabled:
+                    description: 'Whether to enable recording for camera or not'
+                    type: boolean
+                  eventsEnabled:
+                    description: 'Whether to enable creating events for camera or not'
+                    type: boolean
+    putBulkDeviceConfigOrganization:
+      type: object
+      required:
+        - organizationId
+        - config
+      properties:
+        organizationId:
+          $ref: '#/components/schemas/organizationId'
+        groupIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/groupId'
+        config:
+          $ref: '#/components/schemas/deviceConfig'
+    putBulkDeviceConfigImeis:
+      type: object
+      required:
+        - imeis
+        - config
+      properties:
+        imeis:
+          type: array
+          items:
+            $ref: '#/components/schemas/imei'
+        config:
+          $ref: '#/components/schemas/deviceConfig'
+    putBulkEventConfigImeis:
+      type: object
+      required:
+        - imeis
+        - config
+      properties:
+        imeis:
+          type: array
+          items:
+            $ref: '#/components/schemas/imei'
+        config:
+          $ref: '#/components/schemas/eventConfig'
+    putBulkEventConfigGroups:
+      type: object
+      required:
+        - organizationId
+        - config
+      properties:
+        organizationId:
+          $ref: '#/components/schemas/organizationId'
+        groupIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/groupId'
+        config:
+          $ref: '#/components/schemas/eventConfig'
+    connectMedia:
+      title: 'Connect to a media core server'
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          required:
+            - address
+            - mediaToken
+          properties:
+            address:
+              type: string
+              description: |
+                This call will return the URL to retrieve a recording or live video and an authentication token for
+                required for the URL, the token is valid for 30 minutes. After that it can be renewed using the same
+                API, this call will have to be called again if a device does not start streaming within 2 minutes.
+              example: 'prod-us-03.surfsight.net'
+            mediaToken:
+              type: string
+              description: 'Media token generated upon this request'
+              example: 'e3d53477-1f85-42c1-8ed0-2bb591700db8'
+    eventId:
+      description: 'Event ID'
+      type: integer
+      example: 3
+    deviceTelemetry:
+      title: 'Device telemetry'
+      type: object
+      required:
+        - firmwareVersion
+        - deviceModel
+        - lastSeenOnline
+        - simNetworkType
+        - simOperator
+        - simState
+        - calibrationCompleted
+        - sdCardInserted
+        - sdCardCapacityBytes
+        - sdCardFreeBytes
+      properties:
+        firmwareVersion:
+          $ref: '#/components/schemas/firmwareVersion'
+        deviceModel:
+          $ref: '#/components/schemas/deviceModel'
+        lastSeenOnline:
+          $ref: '#/components/schemas/lastSeenOnline'
+        simNetworkType:
+          $ref: '#/components/schemas/simNetworkType'
+        simOperator:
+          $ref: '#/components/schemas/simOperator'
+        simState:
+          $ref: '#/components/schemas/simState'
+        calibrationCompleted:
+          $ref: '#/components/schemas/calibrationCompleted'
+        sdCardInserted:
+          $ref: '#/components/schemas/sdCardInserted'
+        sdCardCapacityBytes:
+          $ref: '#/components/schemas/sdCardCapacityBytes'
+        sdCardFreeBytes:
+          $ref: '#/components/schemas/sdCardFreeBytes'
+    deviceCameraTelemetry:
+      title: 'Device Camera Telemetry'
+      type: object
+      required:
+        - status
+        - code
+      properties:
+        status:
+          description: |
+            The status of the downloading camera stream process
+          type: string
+          example: 'the downloading progress is not started yet or just completed'
+        code:
+          description: |
+            The downloading camera stream process status code. Values:
+            CODE1 - the live stream is in distribution progress
+            CODE2 - the live stream is not yet in progress or just completed
+            CODE3 - the downloading recording is in progress for distribution
+            CODE4 - the downloading recording is in not yet in progress or just completed
+            CODE5 - the downloading progress is not started yet or just completed
+          type: string
+          enum:
+            - CODE1
+            - CODE2
+            - CODE3
+            - CODE4
+            - CODE5
+    event:
+      title: 'Event description'
+      type: object
+      required:
+        - id
+        - eventType
+        - time
+        - lat
+        - lon
+        - files
+      properties:
+        id:
+          $ref: '#/components/schemas/eventId'
+        eventType:
+          $ref: '#/components/schemas/eventType'
+        time:
+          $ref: '#/components/schemas/time'
+        lat:
+          $ref: '#/components/schemas/latitude'
+        lon:
+          $ref: '#/components/schemas/longitude'
+        speed:
+          $ref: '#/components/schemas/speed'
+        files:
+          description:
+            'This array contains descriptions of all files attached to
+            this event'
+          type: array
+          items:
+            description:
+              'This object contains description of a single file attached
+              to the event'
+            type: object
+            required:
+              - cameraId
+              - fileType
+              - fileId
+            properties:
+              cameraId:
+                $ref: '#/components/schemas/cameraId'
+              fileType:
+                $ref: '#/components/schemas/fileType'
+              fileId:
+                $ref: '#/components/schemas/fileId'
+        geoFenceId:
+          $ref: '#/components/schemas/geofenceId'
+        metadata:
+          $ref: '#/components/schemas/eventMetadata'
+    eventDeleted:
+      title: 'Deleted event description'
+      type: object
+      required:
+        - eventId
+        - time
+      properties:
+        eventId:
+          $ref: '#/components/schemas/eventId'
+        time:
+          $ref: '#/components/schemas/time'
+    geofenceId:
+      description: 'Applicable only when event type is geoFence. Contains ID of
+        the relevant geoFence'
+      type: number
+      example: 3
+    cameraId:
+      description: 'ID of the camera this corresponds to the attached file'
+      type: number
+      example: 1
+    fileType:
+      description: 'File type. Currently can be either video or snapshot'
+      type: string
+      enum:
+        - video
+        - snapshot
+    fileId:
+      description: 'This field together with others is used to obtain the
+        attached file. One can obtain this file using event-file-link API'
+      type: string
+      example: '1595077872'
+    geofence:
+      description: 'This object contain geofence event configuration'
+      type: object
+      required:
+        - lat
+        - lon
+        - radius
+        - name
+        - id
+      properties:
+        lat:
+          $ref: '#/components/schemas/latitude'
+        lon:
+          $ref: '#/components/schemas/longitude'
+        radius:
+          description: 'Radius of the geo fence in meters'
+          type: number
+          example: 200
+        name:
+          description: 'Geo fence name'
+          type: string
+          example: 'My geo fence 1'
+        id:
+          $ref: '#/components/schemas/geofenceId'
+    time:
+      title: 'Time'
+      description: 'Time in ISO 8601 format'
+      type: string
+      format: date-time
+      example: '2020-01-01T14:48:00.000Z'
+    eventMetadata:
+      description: 'Event metadata'
+      type: string
+      example: "{type:'Test event',scope:'Some test scope'}"
+    trip:
+      title: 'Trip'
+      description: 'Trip details'
+      type: object
+      required:
+        - start
+        - end
+        - duration
+        - distance
+        - maxSpeed
+        - eventsCount
+      properties:
+        start:
+          $ref: '#/components/schemas/gpsPoint'
+        end:
+          $ref: '#/components/schemas/gpsPoint'
+        duration:
+          type: number
+          description: 'Trip duration in seconds'
+          example: 1427
+        distance:
+          type: number
+          description: 'Trip distance in kilometers'
+          example: 31.6
+        maxSpeed:
+          type: number
+          description: 'Max speed in meters per second units'
+          example: 30.2
+        eventsCount:
+          type: number
+          description: 'Number of events in this trip'
+          example: 12
+    gpsPoint:
+      type: object
+      description: 'GPS point'
+      required:
+        - lat
+        - lon
+        - alt
+        - time
+        - speed
+      properties:
+        lat:
+          $ref: '#/components/schemas/latitude'
+        lon:
+          $ref: '#/components/schemas/longitude'
+        alt:
+          $ref: '#/components/schemas/altitude'
+        time:
+          type: number
+          description: 'Time in seconds from epoch units'
+          example: 1595077872
+        speed:
+          $ref: '#/components/schemas/speed'
+    device:
+      type: object
+      description:
+        'Device description. groupId is optional, it is not set in case
+        the device does not belong to any group inside the organization'
+      required:
+        - name
+        - imei
+      properties:
+        name:
+          $ref: '#/components/schemas/deviceName'
+        imei:
+          $ref: '#/components/schemas/imei'
+        groupId:
+          $ref: '#/components/schemas/groupId'
+    associatedDevices:
+      type: object
+      description: 'Partner contact is a user entity belonging to a partner'
+      required:
+        - imei
+        - associatedDevice
+      properties:
+        imei:
+          $ref: '#/components/schemas/imei'
+        associatedDevice:
+          type: string
+        db:
+          type: string
+    partnerContact:
+      type: object
+      description: 'Partner contact is a user entity belonging to a partner'
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+        email:
+          $ref: '#/components/schemas/email'
+    extendedPartnerContact:
+      allOf:
+        - $ref: '#/components/schemas/partnerContact'
+        - type: object
+          required:
+            - id
+            - role
+          properties:
+            id:
+              type: integer
+            role:
+              type: string
+              enum:
+                - partner
+                - partnerContact
+    extendedDevice:
+      allOf:
+        - $ref: '#/components/schemas/device'
+        - type: object
+          required:
+            - cameras
+            - lat
+            - lon
+            - alt
+            - speed
+          properties:
+            lat:
+              $ref: '#/components/schemas/latitude'
+            lon:
+              $ref: '#/components/schemas/longitude'
+            alt:
+              $ref: '#/components/schemas/altitude'
+            speed:
+              $ref: '#/components/schemas/speed'
+            status:
+              $ref: '#/components/schemas/connectionStatus'
+            lastSeenOnline:
+              $ref: '#/components/schemas/lastSeenOnline'
+            firmwareVersion:
+              $ref: '#/components/schemas/firmwareVersion'
+            deviceModel:
+              $ref: '#/components/schemas/deviceModel'
+            cameras:
+              description: >
+                List of device cameras with their ID's and name's
+              type: array
+              items:
+                type: object
+                required:
+                  - cameraId
+                properties:
+                  cameraId:
+                    description: 'Camera ID'
+                    type: number
+                  name:
+                    description: 'Camera name'
+                    type: string
+            iccid:
+              type: string
+    deviceName:
+      type: string
+      description: 'The name of the device'
+      example: "Aragorn's car"
+    retentionConfig:
+      type: array
+      description: 'Recording retention configuration in minutes'
+      example: '[{"cameraId":1, "retentionMinutes":30}, {"cameraId":2, "retentionMinutes":30},{"cameraId":51, "retentionMinutes":30}]'
+      items:
+        type: object
+        required:
+          - cameraId
+          - retentionMinutes
+        properties:
+          cameraId:
+            $ref: '#/components/schemas/cameraId'
+          retentionMinutes:
+            type: number
+            minimum: 4
+    organization:
+      type: object
+      description: 'Organization definition'
+      required:
+        - name
+      properties:
+        name:
+          $ref: '#/components/schemas/organizationName'
+          example: 5
+        purgeDays:
+          $ref: '#/components/schemas/organizationPurgeDays'
+        purgeDaysFrontCamera:
+          $ref: '#/components/schemas/organizationPurgeDays'
+        purgeDaysRearCamera:
+          $ref: '#/components/schemas/organizationPurgeDays'
+        purgeDaysAuxiliaryCameras:
+          $ref: '#/components/schemas/organizationPurgeDays'
+    extendedOrganization:
+      allOf:
+        - $ref: '#/components/schemas/organization'
+        - type: object
+          required:
+            - id
+            - alarmsCount
+            - partnerId
+          properties:
+            id:
+              $ref: '#/components/schemas/organizationId'
+            partnerId:
+              $ref: '#/components/schemas/partnerId'
+            alarmsCount:
+              type: number
+              description: 'Amount of unread alarms'
+            liveVideoTimeoutSeconds:
+              type: number
+    groupId:
+      type: integer
+      minimum: -1
+      description: 'Group ID'
+      example: 32
+    auditLog:
+      type: object
+      description: 'Audit logs entity'
+      required:
+        - id
+        - message
+        - reason
+      properties:
+        id:
+          type: number
+          description: 'ID of the group'
+          example: 461
+        message:
+          type: string
+          description: 'Audit log message'
+          example: 'Deleted entity'
+        reason:
+          type: string
+          description: 'Audit log reason for the action'
+          example: 'Change purge days value of organization'
+        createdAt:
+          description: 'Creation date, ISO format'
+          type: string
+          format: date-time
+        value:
+          description: 'New value assigned'
+          type: string
+        organizationId:
+          description: 'Organization ID'
+          type: string
+        organizationName:
+          type: string
+          minLength: 1
+          description: 'Organization name'
+          example: 'Amazing organization'
+        partnerId:
+          description: 'Partner ID'
+          type: string
+        partnerName:
+          type: string
+          description: 'Partner name'
+          example: 'Amazing partner'
+        userId:
+          description: 'User ID'
+          type: string
+        userName:
+          type: string
+          description: 'Cool user name'
+          example: 'Amazing organization'
+        imei:
+          type: string
+          description: 'Device IMEI'
+    group:
+      type: object
+      description: 'Group description. Group can contain zero or more devices'
+      required:
+        - name
+        - id
+      properties:
+        name:
+          type: string
+          description: 'Group name'
+          example: 'Mordor group'
+        id:
+          type: number
+          description: 'ID of the group'
+          example: 461
+    groupToCreate:
+      type: object
+      description: 'Group definition'
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: 'Group name'
+          example: 'Mordor group'
+    partner:
+      type: object
+      description: 'Partner definition'
+      required:
+        - id
+        - name
+        - alarmsCount
+      properties:
+        id:
+          $ref: '#/components/schemas/partnerId'
+        name:
+          $ref: '#/components/schemas/partnerName'
+        alarmsCount:
+          type: number
+    user:
+      type: object
+      description: 'User definition'
+      required:
+        - id
+        - email
+      properties:
+        id:
+          $ref: '#/components/schemas/userId'
+        email:
+          $ref: '#/components/schemas/email'
+    webhook:
+      type: object
+      description: 'This object contains webhook definition'
+      required:
+        - imei
+        - url
+        - type
+      properties:
+        imei:
+          $ref: '#/components/schemas/imei'
+        url:
+          type: string
+          description: 'URL where the webhook will be posted'
+          example: 'http://mywebhook.com'
+        type:
+          type: string
+          description: 'Type of the webhook. Can be gps or event. For event type
+            every event triggered for this device will be posted using this webhook.
+            For gps type webhook, all GPS data will be posted'
+          enum:
+            - gps
+            - event
+    lastConnectedAt:
+      title: 'Device Last Connected Time'
+      description: 'Device last connected date and time in format of ISO 8601'
+      type: string
+      format: date-time
+    lastRecordingUpdatedAt:
+      title: 'Device Last Recording Updated Time'
+      description: 'Device last recording updated date and time in format of ISO 8601'
+      type: string
+      format: date-time
+    lastRecordingHealth:
+      title: 'Device Last Recording Health'
+      description: 'Device last recording health'
+      type: boolean
+    deviceHealth:
+      type: object
+      description: 'This object contains device health status'
+      required:
+        - imei
+        - name
+        - organizationId
+        - partnerId
+        - lastConnectedAt
+        - lastRecordingHealth
+        - lastRecordingUpdatedAt
+      properties:
+        name:
+          $ref: '#/components/schemas/deviceName'
+        imei:
+          $ref: '#/components/schemas/imei'
+        organizationId:
+          $ref: '#/components/schemas/organizationId'
+        partnerId:
+          $ref: '#/components/schemas/partnerId'
+        lastConnectedAt:
+          $ref: '#/components/schemas/lastConnectedAt'
+        lastRecordingHealth:
+          $ref: '#/components/schemas/lastRecordingHealth'
+        lastRecordingUpdatedAt:
+          $ref: '#/components/schemas/lastRecordingUpdatedAt'
+    recipientId:
+      title: 'Recipient ID'
+      description: 'Recipient ID'
+      type: number
+    healthReportIntervalSeconds:
+      title: 'Device Health Report Interval'
+      description: 'Device health report email frequency in seconds. To receive report email every hour the value should be 3600'
+      type: number
+    alarmsReportIntervalSeconds:
+      title: 'Device Alarm Report Interval'
+      description: 'Device alarms report email frequency in seconds. To receive report email every hour the value should be 3600'
+      type: number
+    healthRecipient:
+      type: object
+      description: 'Health recipient configuration.'
+      required:
+        - email
+        - reportIntervalSeconds
+      properties:
+        email:
+          $ref: '#/components/schemas/email'
+        reportIntervalSeconds:
+          $ref: '#/components/schemas/healthReportIntervalSeconds'
+        organizationId:
+          $ref: '#/components/schemas/organizationId'
+    extendedHealthRecipient:
+      allOf:
+        - $ref: '#/components/schemas/healthRecipient'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: '#/components/schemas/recipientId'
+    audienceName:
+      type: string
+      description: 'Type of the entity'
+      enum:
+        - surfsight
+        - organization
+        - partner
+    targetEntity:
+      type: string
+      description: 'Target entity'
+      enum:
+        - organization
+        - partner
+        - null
+      example: organization
+    alarmDefinitionId:
+      title: 'Alarm Definition ID'
+      description: 'Alarm Definition ID'
+      type: number
+      example: 625
+    alarmDefinition:
+      type: object
+      description: 'Alarm definition'
+      properties:
+        id:
+          $ref: '#/components/schemas/alarmDefinitionId'
+        name:
+          type: string
+          description: 'Name of the alarm'
+          example: 'Hardware failure: Unable to start camera imager and record'
+        severity:
+          type: number
+          description: 'Severity of the alarm'
+          example: 60
+        recommendation:
+          type: string
+          description: 'Recmmendation to resolve the alarm'
+    alarmId:
+      title: 'Alarm ID'
+      description: 'Alarm ID'
+      type: number
+      example: 625
+    alarmComment:
+      type: object
+      description: 'Alarm comment definition'
+      required:
+        - details
+      properties:
+        details:
+          type: string
+          description: 'Details provided in the alarm comment'
+    extendedAlarmComment:
+      allOf:
+        - $ref: '#/components/schemas/alarmComment'
+        - type: object
+          required:
+            - id
+            - createdAt
+          properties:
+            id:
+              type: integer
+              description: 'ID of the alarm comment'
+            alarmId:
+              $ref: '#/components/schemas/alarmId'
+            createdByAudienceName:
+              $ref: '#/components/schemas/audienceName'
+            createdById:
+              type: integer
+              description: 'user ID of the alarm comment'
+            createdAt:
+              description: 'Creation date, ISO format'
+              type: string
+              format: date-time
+    alarmActionType:
+      title: 'Alarm action type'
+      type: string
+      enum:
+        - open
+        - close
+        - read
+    alarmAction:
+      type: object
+      description: 'Alarm action definition'
+      required:
+        - type
+      properties:
+        type:
+          $ref: '#/components/schemas/alarmActionType'
+    extendedAlarmAction:
+      allOf:
+        - $ref: '#/components/schemas/alarmAction'
+        - type: object
+          required:
+            - id
+            - alarmId
+            - createdByAudienceName
+            - createdById
+            - createdAt
+          properties:
+            id:
+              type: integer
+              description: 'ID of the alarm comment'
+              example: 125
+            alarmId:
+              $ref: '#/components/schemas/alarmId'
+            createdByAudienceName:
+              $ref: '#/components/schemas/audienceName'
+            createdById:
+              type: integer
+              description: 'user ID of the alarm comment'
+              example: 625
+            createdAt:
+              description: 'Creation date, ISO format'
+              type: string
+              format: date-time
+    alarm:
+      type: object
+      description: 'Alarm details'
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/alarmId'
+        details:
+          description: 'Details of the alarm'
+          type: string
+          example: 'cyclic_recorder_status: 4, last_video_record_time: 1600683797'
+        organizationId:
+          $ref: '#/components/schemas/organizationId'
+        organizationName:
+          $ref: '#/components/schemas/organizationName'
+        partnerId:
+          $ref: '#/components/schemas/partnerId'
+        partnerName:
+          $ref: '#/components/schemas/partnerName'
+        userId:
+          $ref: '#/components/schemas/userId'
+        alarmDefinitionId:
+          $ref: '#/components/schemas/alarmDefinitionId'
+        createdAt:
+          description: 'Creation date, ISO format'
+          type: string
+          format: date-time
+        lastReadAt:
+          description: 'Last read date, ISO format'
+          type: string
+          format: date-time
+        lastCloseAt:
+          description: 'Last close date, ISO format'
+          type: string
+          format: date-time
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/extendedAlarmComment'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/extendedAlarmAction'
+    alarmsRecipient:
+      type: object
+      properties:
+        email:
+          $ref: '#/components/schemas/email'
+        reportIntervalSeconds:
+          $ref: '#/components/schemas/alarmsReportIntervalSeconds'
+        alarmDefinitions:
+          type: array
+          items:
+            type: object
+            description: ''
+            required:
+              - id
+            properties:
+              id:
+                type: number
+                description: 'ID of the alarm definition'
+                example: 625
+              name:
+                type: string
+                description: 'Name of the alarm'
+                example: 'Hardware failure: Unable to start camera imager and record'
+    extendedAlarmsRecipient:
+      allOf:
+        - $ref: '#/components/schemas/alarmsRecipient'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: '#/components/schemas/recipientId'
+            createdByAudienceName:
+              $ref: '#/components/schemas/audienceName'
+            createdById:
+              type: integer
+              description: 'ID of the audience name entity'
+            targetEntity:
+              $ref: '#/components/schemas/targetEntity'
+            targetId:
+              type: integer
+              description: 'ID of the target entity.'
+            lastReportAt:
+              description: 'Last report date, ISO format'
+              type: string
+              format: date-time
+    metadata:
+      description: 'This object contains pagination metadata of count'
+      type: object
+      required:
+        - count
+        - limit
+        - offset
+      properties:
+        count:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+    error:
+      title: 'Error'
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: 'Error name'
+        message:
+          type: string
+          description: 'Error message'
